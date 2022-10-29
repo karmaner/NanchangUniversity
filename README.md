@@ -1,2 +1,87 @@
-# NanchangUniversity
-Nanchang University Software Engineering Undergraduate and Information Security Undergraduate Training Program
+# Nanchang University
+* Nanchang University Software Engineering Undergraduate and Information Security Undergraduate Training Program
+
+### 南昌大学软件学院
+
+---
+
+本仓库志立于记录和分享软件学院的培养方案
+
+
+
+## 介绍
+
+软件学院大一大二为大类专业(2021):学习公共课程**大三**开始方向分流
+
+
+
+pre大一
+
+
+
+---
+
+1. 军事技能训练
+
+---
+
+
+
+大一秋课程
+
+---
+
+1. C语言程序设计
+2. 计算机电路基础
+3. 计算机概论
+4. 大学英语
+5. 体育（1）
+6. 形式与政策（1）
+7. 思想道德与法治
+8. 高等数学(1)上
+9. 军事理论
+
+
+
+---
+
+大一春课程
+
+
+
+---
+
+
+
+必修课 ：
+
+1. Java程序设计
+2. 大学生心理健康指导
+3. 英语类
+4. 体育（2）
+5. 形式与政策（2）
+6. 中国近代史纲要
+7. 线性代数
+8. 高等数学（1）下
+9. 大学生职业发展与就业指导
+10. 大学生劳动教育概论
+
+
+
+选修课：
+
+1. C程序设计竞赛实训
+2. 动画电影赏析
+
+---
+
+
+
+done 2022/10/29/19：48
+
+
+
+
+
+
+
