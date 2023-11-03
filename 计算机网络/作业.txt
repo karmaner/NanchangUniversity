@@ -1,0 +1,33 @@
+[Huawei]
+<Huawei>sys
+Enter system view, return user view with Ctrl+Z.
+[Huawei]int 	
+[Huawei]interface tu	
+[Huawei]interface Tunnel 0/0/0
+[Huawei-Tunnel0/0/0]ip ad	
+[Huawei-Tunnel0/0/0]ip address 172.168.1.1 24
+Error: The address already exists.
+[Huawei-Tunnel0/0/0]tun	
+[Huawei-Tunnel0/0/0]sou	
+[Huawei-Tunnel0/0/0]source ser	
+[Huawei-Tunnel0/0/0]source Serial 1/0/0
+[Huawei-Tunnel0/0/0]des	
+[Huawei-Tunnel0/0/0]description 200.1.1.254
+[Huawei-Tunnel0/0/0]q
+[Huawei]ip rou	
+[Huawei]ip route 10.2.2.0 24 172.168.1.2
+[Huawei]ip ro 0.0.0.0 0 168.1.1.253
+[Huawei]
+
+
+[Huawei]
+<Huawei>sys
+Enter system view, return user view with Ctrl+Z.
+[Huawei]
+[Huawei-Serial0/0/0]nat s	
+[Huawei-Serial0/0/0]nat sta	
+[Huawei-Serial0/0/0]nat static gl	
+[Huawei-Serial0/0/0]nat static global 202.96.134.11 ins	
+[Huawei-Serial0/0/0]nat static global 202.96.134.11 inside 10.2.2.100
+[Huawei-Serial0/0/0]q
+[Huawei]

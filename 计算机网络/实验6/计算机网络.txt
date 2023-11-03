@@ -1,0 +1,87 @@
+The device is running!
+
+<Huawei>sys
+Enter system view, return user view with Ctrl+Z.
+[Huawei]undo inf en
+Info: Information center is disabled.
+[Huawei]inter s0/0/0
+[Huawei-Serial0/0/0]ip add 192.168.12.1 30
+[Huawei]inter g0/0/1
+[Huawei-GigabitEthernet0/0/1]ip add 192.168.1.1 24
+[Huawei-GigabitEthernet0/0/1]
+[Huawei-GigabitEthernet0/0/1]q
+<Huawei>sys
+Enter system view, return user view with Ctrl+Z.
+[Huawei]ip route-s	
+[Huawei]ip route-static 192.168.10.0 24 192.168.12.2
+[Huawei]ip route-static 192.168.20.0 24 192.168.12.2
+[Huawei]
+[Huawei]
+
+The device is running!
+
+<Huawei>sys
+Enter system view, return user view with Ctrl+Z.
+[Huawei]undo inf en
+Info: Information center is disabled.
+[Huawei]inter s0/0/0
+[Huawei-Serial0/0/0]ip add 192.168.12.2 30
+[Huawei-Serial0/0/0]q
+[Huawei]inter g0/0/1
+[Huawei-GigabitEthernet0/0/1]ip add 192.168.10.1 24
+[Huawei-GigabitEthernet0/0/1]inter g0/0/2
+[Huawei-GigabitEthernet0/0/2]ip add 192.168.20.1 24
+[Huawei-GigabitEthernet0/0/2]
+[Huawei-GigabitEthernet0/0/2]q
+[Huawei]ip route
+[Huawei]ip route-s
+[Huawei]ip route-static 192.168.1.0 24 192.168.12.1
+<Huawei>
+
+
+The device is running!
+
+<Huawei>sys
+Enter system view, return user view with Ctrl+Z.
+[Huawei]undo inf en
+Info: Information center is disabled.
+[Huawei]inter s0/0/0
+[Huawei-Serial0/0/0]ip add 192.168.12.1 30
+[Huawei]inter g0/0/1
+[Huawei-GigabitEthernet0/0/1]ip add 192.168.1.1 24
+[Huawei-GigabitEthernet0/0/1]
+[Huawei-GigabitEthernet0/0/1]q
+[Huawei]rip
+[Huawei-rip-1]network 192.168.1.0
+[Huawei-rip-1]network 192.168.12.0
+[Huawei-rip-1]q
+[Huawei]
+<Huawei>
+
+
+The device is running!
+
+<Huawei>sys
+Enter system view, return user view with Ctrl+Z.
+[Huawei]undo inf en
+Info: Information center is disabled.
+[Huawei]inter s0/0/0
+[Huawei-Serial0/0/0]ip add 192.168.12.2 30
+[Huawei-Serial0/0/0]q
+[Huawei]inter g0/0/1
+[Huawei-GigabitEthernet0/0/1]ip add 192.168.10.1 24
+[Huawei-GigabitEthernet0/0/1]inter g0/0/2
+[Huawei-GigabitEthernet0/0/2]ip add 192.168.20.1 24
+[Huawei-GigabitEthernet0/0/2]
+[Huawei-GigabitEthernet0/0/2]q
+[Huawei]rip
+[Huawei-rip-1]network 192.168.12.1
+Error: The network address is invalid, and the specified address must be major-n
+et address without any subnets.
+[Huawei-rip-1]network 192.168.12.0
+[Huawei-rip-1]network 192.168.10.0
+[Huawei-rip-1]network 192.168.20.0
+[Huawei-rip-1]
+<Huawei>
+<Huawei>
+

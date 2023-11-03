@@ -1,0 +1,202 @@
+<html><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0070)http://studwww.eurecom.fr/~grangier/applets/lineSim1112/src/index.html -->
+<HTML><HEAD>
+<META http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+<META content="MSHTML 5.50.4134.600" name=GENERATOR></HEAD>
+<BODY>/////////////////////////////////////// <BR>//LineSimApllet <BR>//written 
+by David Grangier, Institut Eurecom, France <BR>//david.grangier@eurecom.fr 
+<BR>/////////////////////////////////////// 
+<P>package linesim; <BR>//imports <BR>import java.awt.*; <BR>import 
+java.awt.event.*; <BR>import java.awt.image.*; <BR>import java.applet.*; 
+<BR>import java.util.*; 
+<P>//Applet Class <BR>public class LineSimApplet extends Applet { <BR>&nbsp; 
+//buttons <BR>&nbsp; Button start=new Button ("Start"); <BR>&nbsp; Button 
+stop=new Button ("Reset"); <BR>&nbsp; //features lists <BR>&nbsp; MyChoice 
+length=new MyChoice(new String[] {"10 km","100 km","1000 km"},new double[] 
+{10E3,100E3,1E6},3); <BR>&nbsp; MyChoice rate=new MyChoice(new String[] {"512 
+kps","1 Mbps","10 Mbps","100 Mbps"},new double[] {512E3,1E6,10E6,100E6},2); 
+<BR>&nbsp; MyChoice size=new MyChoice(new String[] {"100 Bytes","500 Bytes","1 
+kBytes"},new double[] {8E2,4E3,8E3},1); <BR>&nbsp; //to simulate time <BR>&nbsp; 
+Thread timerThread; <BR>&nbsp; TickTask timerTask; <BR>&nbsp; boolean 
+simulationRunning=false; <BR>&nbsp; //communication line <BR>&nbsp; Line myLine; 
+
+<P>&nbsp; public void init() { <BR>&nbsp;&nbsp;&nbsp; try { 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; setBackground(Color.white); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add(new Label ("Length",Label.RIGHT)); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add(length); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add(new Label("Rate",Label.RIGHT)); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add(rate); <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+add(new Label("Packet size",Label.RIGHT)); <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+add(size); <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //start 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; start.addActionListener( 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new ActionListener() 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public void 
+actionPerformed (ActionEvent event) 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+launchSim(); <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add(start); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //stop <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+Button stop=new Button ("Reset"); <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+stop.addActionListener( <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; new 
+ActionListener() <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public void 
+actionPerformed (ActionEvent event) 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+stopSim(); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //clear 
+line <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+myLine.sendTime(0); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //redraw 
+cleared line 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LineSimApplet.this.repaint(); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add(stop); <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+//line <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; myLine= new Line(40,50,450,10); 
+<BR>&nbsp;&nbsp;&nbsp; } <BR>&nbsp;&nbsp;&nbsp; catch(Exception e) { 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e.printStackTrace(); <BR>&nbsp;&nbsp;&nbsp; } 
+<BR>&nbsp; } 
+<P>&nbsp; public void paint (Graphics g) <BR>&nbsp; { <BR>&nbsp;&nbsp;&nbsp; 
+update(g); // eliminate flashing : update is overriden <BR>&nbsp; } 
+<P>&nbsp; public void update (Graphics g) <BR>&nbsp; { //work on a offscreen 
+image 
+<P>&nbsp;&nbsp;&nbsp; Dimension offDimension = getSize(); <BR>&nbsp;&nbsp;&nbsp; 
+Image offImage = createImage(offDimension.width, offDimension.height); 
+<BR>&nbsp;&nbsp;&nbsp; Graphics offGraphics = offImage.getGraphics(); 
+<BR>&nbsp;&nbsp;&nbsp; myLine.drawLine(offGraphics); 
+<P>&nbsp;&nbsp;&nbsp; //sender <BR>&nbsp;&nbsp;&nbsp; 
+offGraphics.setColor(Color.blue); <BR>&nbsp;&nbsp;&nbsp; 
+offGraphics.fillRect(10,40,30,30); <BR>&nbsp;&nbsp;&nbsp; 
+offGraphics.setColor(Color.black); <BR>&nbsp;&nbsp;&nbsp; 
+offGraphics.drawString("Sender",5,90); <BR>&nbsp;&nbsp;&nbsp; 
+offGraphics.drawRect(10,40,30,30); 
+<P>&nbsp;&nbsp;&nbsp; //receiver <BR>&nbsp;&nbsp;&nbsp; 
+offGraphics.setColor(Color.blue); <BR>&nbsp;&nbsp;&nbsp; 
+offGraphics.fillRect(490,40,30,30); <BR>&nbsp;&nbsp;&nbsp; 
+offGraphics.setColor(Color.black); <BR>&nbsp;&nbsp;&nbsp; 
+offGraphics.drawString("Receiver",485,90); <BR>&nbsp;&nbsp;&nbsp; 
+offGraphics.drawRect(490,40,30,30); 
+<P>&nbsp;&nbsp;&nbsp; offGraphics.drawString("Propagation speed : 2.8 x 10^8 
+m/sec",175,105); <BR>&nbsp;&nbsp;&nbsp; //display offscreen image 
+<BR>&nbsp;&nbsp;&nbsp; g.drawImage(offImage, 0, 0, this); <BR>&nbsp; } 
+<P>&nbsp; private void launchSim() <BR>&nbsp; { <BR>&nbsp;&nbsp;&nbsp; 
+setupEnabled(false); <BR>&nbsp;&nbsp;&nbsp; //setup line <BR>&nbsp;&nbsp;&nbsp; 
+myLine.setup(length.getVal(), rate.getVal() ); <BR>&nbsp;&nbsp;&nbsp; 
+myLine.emitPacket(size.getVal(),0); <BR>&nbsp;&nbsp;&nbsp; //setup timer 
+<BR>&nbsp;&nbsp;&nbsp; timerTask=new TickTask(1E-5,myLine.totalTime()); 
+<BR>&nbsp;&nbsp;&nbsp; timerThread=new Thread(timerTask); <BR>&nbsp;&nbsp;&nbsp; 
+//start simulation <BR>&nbsp;&nbsp;&nbsp; simulationRunning=true; 
+<BR>&nbsp;&nbsp;&nbsp; timerThread.start(); <BR>&nbsp; } 
+<P>&nbsp; private void stopSim() <BR>&nbsp; { <BR>&nbsp;&nbsp;&nbsp; 
+timerTask.endNow(); <BR>&nbsp;&nbsp;&nbsp; simulationRunning=false; 
+<BR>&nbsp;&nbsp;&nbsp; setupEnabled(true); <BR>&nbsp; } 
+<P>&nbsp; public void setupEnabled(boolean value) <BR>&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp; start.setEnabled(value); <BR>&nbsp;&nbsp;&nbsp; 
+length.setEnabled(value); <BR>&nbsp;&nbsp;&nbsp; rate.setEnabled(value); 
+<BR>&nbsp;&nbsp;&nbsp; size.setEnabled(value); <BR>&nbsp; } 
+<P>&nbsp; //my choice <BR>&nbsp; class MyChoice extends Choice <BR>&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp; private double vals[]; 
+<P>&nbsp;&nbsp;&nbsp; public MyChoice(String items[], double values[],int 
+defaultValue) <BR>&nbsp;&nbsp;&nbsp; { <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; for 
+(int i=0; i&lt;items.length;i++) {super.addItem(items[i]);} 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vals=values; 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; select(defaultValue-1); 
+<BR>&nbsp;&nbsp;&nbsp; } 
+<P>&nbsp;&nbsp;&nbsp; public double getVal() {return&nbsp; 
+vals[super.getSelectedIndex()];} <BR>&nbsp; } <BR>&nbsp; //tickTask <BR>&nbsp; 
+class TickTask implements Runnable <BR>&nbsp; { <BR>&nbsp;&nbsp;&nbsp; private 
+double counter; <BR>&nbsp;&nbsp;&nbsp; private double length; 
+<BR>&nbsp;&nbsp;&nbsp; private double tick; 
+<P>&nbsp;&nbsp;&nbsp; public TickTask(double t,double l) <BR>&nbsp;&nbsp;&nbsp; 
+{ <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; length=l; 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; tick=t; <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+counter=0; <BR>&nbsp;&nbsp;&nbsp; } 
+<P>&nbsp;&nbsp;&nbsp; public void run() <BR>&nbsp;&nbsp;&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; while (LineSimApplet.this.simulationRunning) 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; counter+=tick; 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LineSimApplet.this.myLine.sendTime(counter); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LineSimApplet.this.repaint(); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (counter&gt;=length) 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LineSimApplet.this.myLine.clearPackets(); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+LineSimApplet.this.timerThread.suspend(); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; try&nbsp; 
+{LineSimApplet.this.timerThread.sleep(50);} catch (Exception e) { } 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } <BR>&nbsp;&nbsp;&nbsp; } 
+<P>&nbsp;&nbsp;&nbsp; public void endNow() { <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+length=counter; <BR>&nbsp;&nbsp;&nbsp; } <BR>&nbsp; } <BR>} 
+<P>//Line class <BR>class Line <BR>{ <BR>&nbsp; //graphic variables <BR>&nbsp; 
+private int gX; <BR>&nbsp; private int gY; <BR>&nbsp; private int gWidth; 
+<BR>&nbsp; private int gHeight; <BR>&nbsp; //characteristic variables <BR>&nbsp; 
+final double celerity = 2.8E+8; <BR>&nbsp; private double length; <BR>&nbsp; 
+private double rate; <BR>&nbsp; //simulation variables <BR>&nbsp; private double 
+time; <BR>&nbsp; private Packet myPacket; 
+<P>&nbsp; public Line(int x, int y, int w, int h) <BR>&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp; //graphic init <BR>&nbsp;&nbsp;&nbsp; gX=x; 
+<BR>&nbsp;&nbsp;&nbsp; gY=y; <BR>&nbsp;&nbsp;&nbsp; gWidth=w; 
+<BR>&nbsp;&nbsp;&nbsp; gHeight=h; <BR>&nbsp; } 
+<P>&nbsp; public void setup(double l, double r) <BR>&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp; length=l; <BR>&nbsp;&nbsp;&nbsp; rate=r; <BR>&nbsp; } 
+<P>&nbsp; void sendTime(double now) <BR>&nbsp; { <BR>&nbsp;&nbsp;&nbsp; 
+time=now; //update time <BR>&nbsp;&nbsp;&nbsp; removeReceivedPackets(now); 
+<BR>&nbsp; } 
+<P>&nbsp; void emitPacket(double s, double eT) <BR>&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp; myPacket= new Packet(s,eT); <BR>&nbsp; } 
+<P>&nbsp; private void removeReceivedPackets(double now) <BR>&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp; if (!(myPacket==null)) <BR>&nbsp;&nbsp;&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ( 
+now&gt;myPacket.emissionTime+(myPacket.size/rate)+length*celerity ) 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; clearPackets(); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } <BR>&nbsp;&nbsp;&nbsp; } <BR>&nbsp; } 
+<P>&nbsp; public void clearPackets() <BR>&nbsp; { <BR>&nbsp;&nbsp;&nbsp; 
+myPacket=null; <BR>&nbsp; } 
+<P>&nbsp; public double totalTime() <BR>&nbsp; { <BR>&nbsp;&nbsp;&nbsp; double 
+emmissionTime=(myPacket.size/rate); <BR>&nbsp;&nbsp;&nbsp; double 
+onLineTime=(length/celerity); <BR>&nbsp;&nbsp;&nbsp; return 
+(emmissionTime+onLineTime); <BR>&nbsp; } 
+<P>&nbsp; public void drawLine(Graphics g) <BR>&nbsp; { <BR>&nbsp;&nbsp;&nbsp; 
+g.setColor(Color.white); <BR>&nbsp;&nbsp;&nbsp; 
+g.fillRect(gX,gY+1,gWidth,gHeight-2); <BR>&nbsp;&nbsp;&nbsp; 
+g.setColor(Color.black); <BR>&nbsp;&nbsp;&nbsp; 
+g.drawRect(gX,gY,gWidth,gHeight); <BR>&nbsp;&nbsp;&nbsp; g.setColor(Color.red); 
+<BR>&nbsp;&nbsp;&nbsp; 
+g.drawString(timeToString(time),gX+gWidth/2-10,gY+gHeight+15); 
+<BR>&nbsp;&nbsp;&nbsp; drawPackets(g); <BR>&nbsp; } 
+<P>&nbsp; private void drawPackets(Graphics g) <BR>&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp; if (!(myPacket==null)) <BR>&nbsp;&nbsp;&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; double xfirst; 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; double xlast; 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //compute time units 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xfirst=time-myPacket.emissionTime; 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xlast=xfirst-(myPacket.size/rate); 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //compute position 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xfirst=xfirst*celerity*gWidth/length; 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xlast=xlast*celerity*gWidth/length; 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (xlast&lt;0) {xlast=0;} 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (xfirst&gt;gWidth ) {xfirst=gWidth;} 
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //draw <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+g.setColor(Color.red); <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+g.fillRect(gX+(int)(xlast),gY+1,(int)(xfirst-xlast),gHeight-2); 
+<BR>&nbsp;&nbsp;&nbsp; } <BR>&nbsp; } 
+<P>&nbsp; static private String timeToString(double now) <BR>&nbsp; { 
+<BR>&nbsp;&nbsp;&nbsp; String res=Double.toString(now*1000); 
+<BR>&nbsp;&nbsp;&nbsp; int dot=res.indexOf('.'); <BR>&nbsp;&nbsp;&nbsp; String 
+deci=res.substring(dot+1)+"000"; <BR>&nbsp;&nbsp;&nbsp; 
+deci=deci.substring(0,3); <BR>&nbsp;&nbsp;&nbsp; String 
+inte=res.substring(0,dot); <BR>&nbsp;&nbsp;&nbsp; return inte+"."+deci+" ms"; 
+<BR>&nbsp; } <BR>} 
+<P>class Packet <BR>{ <BR>&nbsp; double size; <BR>&nbsp; double emissionTime; 
+<P>&nbsp; Packet(double s, double eT) <BR>&nbsp; { <BR>&nbsp;&nbsp;&nbsp; 
+size=s; <BR>&nbsp;&nbsp;&nbsp; emissionTime=eT; <BR>&nbsp; } <BR>} <BR>&nbsp; 
+</P></BODY></HTML>

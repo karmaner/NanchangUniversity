@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<HTML>
+<HEAD>
+<TITLE>
+报文分段
+</TITLE>
+
+<style type="text/css">
+
+H1	{font-size:25px;font-family: 黑体;}
+
+P	{font-family:Arial, sans-serif; font-size:14px;}
+
+LI	{font-family:Arial, sans-serif; font-size:14px;}
+
+a:link	{color:#000066;}
+
+a:visited	{color:#666666;}
+
+</style>
+
+</HEAD>
+<BODY bgcolor="white">
+
+<h1>报文分段</h1>
+<P>通过这个交互式的程序，你将会看到分组交换与报文交换相比有较小的端到端时延，在这个程序中有四个标志：源端（记为A），目的端（记为B），以及中间两个存储转发的交换机。每一个从源端发送的数据包在到达目的端之前必须经过三条链路。每一条链路的传输速率为4kpbs，并可选择是否有时延。
+<p>
+每一个小的矩形代表1kbit的数据。当你点击开始键时， 这个分组首先被发送到第一个交换机，然后经过存储转发到达第二个交换机，依次往下，最终到达目的端。
+<p>
+为了模拟<b>报文交换</b>, 可以设置报文大小与分组大小相等。为了模拟<b>分组交换</b>, 可以设置分组大小小于报文大小。为了测试链路传播时延的影响，可选择性的设置某段链路具有传播时延。 建议大家根据所设参数计算一下端到端时延，并把所得数据与实验中所得数据进行比较。
+<P>
+<HR WIDTH="100%">
+<CENTER>
+<APPLET CODEBASE=file://"E:\document\软件学院\教学\参考\计算机网络\计算机网络实验教程光盘\jiaofu\pearsoncmg3\src" CODE="MessageSwitching.class" WIDTH="560" HEIGHT="465">
+</APPLET>
+</CENTER>
+<p>这个程序是由张树春1997年在宾夕凡尼亚州大学工作时编写的。</p>
+<P>
+
+</BODY>
+</HTML>
